@@ -64,3 +64,22 @@ Quando o aplicativo for instalado no Android:
 1. Abra o app **Budgeting**.
 2. Clique no ícone de smartphone no cabeçalho ou vá em **Monitoramento de Notificações**.
 3. Toque em **Conceder no Android** para permitir que o app acesse as notificações de transferências e pagamentos das suas contas bancárias.
+
+---
+
+## Autenticação no APK e Erro `auth/unauthorized-domain`
+
+No aplicativo instalado no Android (APK), o modo de autenticação mais rápido e 100% compatível é o **E-mail e Senha** ou **Convidado**:
+- Eles utilizam comunicação direta via API REST com a nuvem, sem bloqueios de janelas pop-up ou verificações de domínio no WebView.
+
+### Para habilitar o Login com Google também no APK:
+Se desejar usar especificamente o botão do Google no APK:
+1. Acesse o [Console do Firebase](https://console.firebase.google.com).
+2. Selecione o seu projeto (**gen-lang-client-0744448280**).
+3. No menu lateral esquerdo, vá em **Autenticação** (Authentication).
+4. Clique na aba **Configurações** (ou Métodos de Login) e role até a seção **Domínios autorizados** (Authorized domains).
+5. Clique no botão **Adicionar domínio** e digite:
+   - `localhost`
+6. Clique em **Salvar**.
+Pronto! Com o domínio `localhost` autorizado, o erro `auth/unauthorized-domain` deixará de ocorrer ao utilizar serviços Web do Firebase dentro do WebView do Android.
+

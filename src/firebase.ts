@@ -178,6 +178,14 @@ export async function loginWithGoogle(): Promise<User> {
   } catch (error: any) {
     console.error('Erro ao fazer login com Google:', error);
     if (
+      error?.code === 'auth/unauthorized-domain' ||
+      error?.message?.includes('unauthorized-domain')
+    ) {
+      throw new Error(
+        'Domínio não autorizado no Firebase (auth/unauthorized-domain). No APK do Android, utilize o Login com E-mail e Senha ou Convidado para conectar imediatamente.'
+      );
+    }
+    if (
       error?.code === 'auth/operation-not-supported-in-this-environment' ||
       error?.message?.includes('action is invalid') ||
       error?.message?.includes('invalid action') ||
