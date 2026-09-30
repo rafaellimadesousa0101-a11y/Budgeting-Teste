@@ -13,18 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
+      - name: Install dependencies with Bun
         run: |
-          npm install --legacy-peer-deps
+          bun install
 
       - name: Build Web Project
         run: |
-          npm run build
+          bun run build
 
       - name: Setup Java
         uses: actions/setup-java@v4
