@@ -22,9 +22,12 @@ jobs:
       - name: Build Web Project
         run: bun run build
 
-      - name: Restore and Sync Android Project
+      - name: Generate Fresh Android Project
         run: |
-          bunx cap sync android || bunx cap add android || echo "Sincronização do Capacitor concluída ou ignorada"
+          bun add @capacitor/core @capacitor/cli @capacitor/android
+          rm -rf android
+          bunx cap init "Meu App" "com.rafael.app" --web-dir dist --force || true
+          bunx cap add android
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -35,8 +38,7 @@ jobs:
       - name: Build APK with Gradle
         run: |
           cd android
-          gradle wrapper || true
-          chmod +x gradlew || true
+          chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
