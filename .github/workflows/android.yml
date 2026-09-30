@@ -13,18 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
-        run: bun install
+        run: npm install --legacy-peer-deps
 
       - name: Build Web Project
-        run: bun run build
+        run: npm run build
 
       - name: Sync Capacitor Android Platform
-        run: |
-          bunx cap sync android
+        run: npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -41,6 +43,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: budgeting-apk
           path: android/app/build/outputs/apk/debug/*.apk
           retention-days: 30
