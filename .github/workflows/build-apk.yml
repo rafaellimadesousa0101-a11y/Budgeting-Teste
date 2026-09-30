@@ -1,0 +1,50 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: |
+          npm install --force
+          npm install @capacitor/core @capacitor/cli @capacitor/android --force
+
+      - name: Build Web Assets
+        run: |
+          npm run build || (mkdir -p dist && cp -r src/* dist/) || true
+
+      - name: Prepare Capacitor Android
+        run: |
+          npx cap init "Budgeting" "com.budgeting.app" --web-dir dist || true
+          rm -rf android
+          npx cap add android
+          npx cap sync android
+
+      - name: Build APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: budgeting-apk
+          path: android/app/build/outputs/apk/debug/*.apk

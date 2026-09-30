@@ -1,0 +1,339 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import sharp from 'sharp';
+
+// SVG template for the flying budgie icon (512x512)
+// Designed to match the exact budgie character from BudgetingLogo.tsx:
+// - Emerald green plumage with belly gradient
+// - Sunny yellow head with blue cere, orange beak, purple cheek spot & black dots
+// - Black zebra stripes on nape and wings
+// - Wide-spread flight wings with emerald/yellow/forest green barred feathers
+// - Graceful streaming tail (emerald + azure blue)
+// - Little perching feet and claws visible and aerodynamically tucked
+// - Fits comfortably within the maskable safe zone (circle r=205 around center 256,256)
+
+function getBudgieSvg({ isMaskable = false } = {}) {
+  // For maskable icon, keep a solid edge-to-edge background with appropriate safe zone
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#18181b" />
+      <stop offset="50%" stopColor="#121820" />
+      <stop offset="100%" stopColor="#09090b" />
+    </linearGradient>
+    <radialGradient id="ambient-glow" cx="50%" cy="48%" r="48%">
+      <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+      <stop offset="60%" stopColor="#059669" stopOpacity="0.08" />
+      <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+    </radialGradient>
+    <radialGradient id="sun-glow" cx="64%" cy="40%" r="35%">
+      <stop offset="0%" stopColor="#fef08a" stopOpacity="0.18" />
+      <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+    </radialGradient>
+
+    <!-- Budgie Gradients -->
+    <linearGradient id="bird-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#34d399" />
+      <stop offset="45%" stopColor="#10b981" />
+      <stop offset="100%" stopColor="#047857" />
+    </linearGradient>
+    <linearGradient id="bird-belly" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stopColor="#4ade80" />
+      <stop offset="60%" stopColor="#22c55e" />
+      <stop offset="100%" stopColor="#15803d" />
+    </linearGradient>
+    <linearGradient id="bird-head" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#fef08a" />
+      <stop offset="60%" stopColor="#facc15" />
+      <stop offset="100%" stopColor="#eab308" />
+    </linearGradient>
+    <linearGradient id="wing-far" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#065f46" />
+      <stop offset="60%" stopColor="#047857" />
+      <stop offset="100%" stopColor="#022c22" />
+    </linearGradient>
+    <linearGradient id="wing-near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#10b981" />
+      <stop offset="35%" stopColor="#059669" />
+      <stop offset="80%" stopColor="#047857" />
+      <stop offset="100%" stopColor="#022c22" />
+    </linearGradient>
+    <linearGradient id="tail-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#38bdf8" />
+      <stop offset="100%" stopColor="#0284c7" />
+    </linearGradient>
+    <linearGradient id="tail-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#10b981" />
+      <stop offset="100%" stopColor="#064e3b" />
+    </linearGradient>
+
+    <!-- Drop Shadows for 3D depth -->
+    <filter id="bird-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" floodColor="#000000" floodOpacity="0.45" />
+      <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="#047857" floodOpacity="0.3" />
+    </filter>
+    <filter id="wing-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="-2" dy="6" stdDeviation="6" floodColor="#000000" floodOpacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" ${isMaskable ? '' : 'rx="116"'} fill="url(#bg-grad)" />
+
+  <!-- Subtle Subtle Inner Ring / Financial Arc in background -->
+  <circle cx="256" cy="256" r="190" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+  <circle cx="256" cy="256" r="140" stroke="rgba(16,185,129,0.08)" strokeWidth="2" strokeDasharray="12 12" />
+
+  <!-- Ambient Glow Behind Budgie -->
+  <rect width="512" height="512" ${isMaskable ? '' : 'rx="116"'} fill="url(#ambient-glow)" />
+  <circle cx="320" cy="210" r="160" fill="url(#sun-glow)" />
+
+  <!-- FLYING BUDGIE CHARACTER -->
+  <g filter="url(#bird-shadow)">
+    <!-- 1. FAR WING (Raised high in upward flap, full flight spread) -->
+    <g id="far-wing" filter="url(#wing-shadow)">
+      <!-- Far Wing Outer Base -->
+      <path
+        d="M 230 205 C 220 150 205 90 235 60 C 265 85 270 145 285 190 Z"
+        fill="url(#wing-far)"
+        stroke="#022c22"
+        strokeWidth="2"
+      />
+      <!-- Flight Feathers Pinions (Primary remiges) -->
+      <path
+        d="M 210 160 C 200 120 215 80 235 60 C 242 85 240 125 240 165 Z"
+        fill="#047857"
+        stroke="#022c22"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M 195 180 C 190 145 200 105 220 78 C 228 102 228 140 225 185 Z"
+        fill="#065f46"
+        stroke="#022c22"
+        strokeWidth="1.5"
+      />
+      <!-- Far Wing Yellow Bars (Tiger scalloping) -->
+      <path d="M 215 130 Q 235 125 250 105" stroke="#facc15" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <path d="M 225 155 Q 248 145 265 125" stroke="#fef08a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M 235 180 Q 255 170 275 145" stroke="#052e16" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </g>
+
+    <!-- 2. STREAMING TAIL FEATHERS (Flowing gracefully behind in flight) -->
+    <g id="tail-feathers">
+      <!-- Main Green Tail Feather -->
+      <path
+        d="M 185 305 L 85 410 L 115 400 L 205 320 Z"
+        fill="url(#tail-green)"
+        stroke="#064e3b"
+        strokeWidth="1.8"
+      />
+      <!-- Bright Blue Central Rudder Feather -->
+      <path
+        d="M 192 310 L 105 425 L 128 418 L 212 325 Z"
+        fill="url(#tail-blue)"
+        stroke="#0369a1"
+        strokeWidth="1.5"
+      />
+      <!-- Secondary Shorter Tail Accent Feather -->
+      <path
+        d="M 198 316 L 145 405 L 162 398 L 218 330 Z"
+        fill="#047857"
+      />
+    </g>
+
+    <!-- 3. AERODYNAMIC PLUMP BODY (Tapered for dynamic flight) -->
+    <g id="body">
+      <!-- Main Body Contour -->
+      <path
+        d="M 190 230 C 180 280 205 325 255 330 C 300 335 325 295 315 240 C 310 200 240 195 190 230 Z"
+        fill="url(#bird-body)"
+        stroke="#065f46"
+        strokeWidth="2.5"
+      />
+      <!-- Belly Soft Green Feather Curve (Radiant emerald highlight) -->
+      <path
+        d="M 215 245 C 205 290 225 322 265 325 C 295 325 315 290 310 245 C 285 240 240 235 215 245 Z"
+        fill="url(#bird-belly)"
+        opacity="0.85"
+      />
+      <!-- Rump soft fluff -->
+      <path
+        d="M 185 270 C 180 295 195 315 215 318 C 210 295 195 280 185 270 Z"
+        fill="#10b981"
+        opacity="0.7"
+      />
+    </g>
+
+    <!-- 4. PERCHING LEGS & CLAWS (Tucked backward in flight, clearly visible) -->
+    <g id="budgie-feet" strokeLinecap="round">
+      <!-- Feather Puffs on thighs -->
+      <path d="M 215 312 C 210 322 226 325 228 316 Z" fill="#10b981" stroke="#065f46" strokeWidth="1.2" />
+      <path d="M 245 315 C 240 326 256 328 258 318 Z" fill="#10b981" stroke="#065f46" strokeWidth="1.2" />
+
+      <!-- Left Foot (Scaled tarsus + back-swept toes) -->
+      <line x1="222" y1="318" x2="215" y2="334" stroke="#71717a" strokeWidth="4.5" />
+      <line x1="222" y1="319" x2="216" y2="333" stroke="#e4e4e7" strokeWidth="1.8" />
+      <!-- Left Claws -->
+      <path d="M 215 334 Q 210 342 205 345" stroke="#52525b" strokeWidth="3" fill="none" />
+      <path d="M 205 345 L 202 347" stroke="#18181b" strokeWidth="2" />
+      <path d="M 215 334 Q 214 345 211 349" stroke="#71717a" strokeWidth="3.2" fill="none" />
+      <path d="M 211 349 L 209 352" stroke="#18181b" strokeWidth="2" />
+      <path d="M 215 334 Q 220 344 222 348" stroke="#52525b" strokeWidth="3" fill="none" />
+      <path d="M 222 348 L 224 350" stroke="#18181b" strokeWidth="2" />
+
+      <!-- Right Foot (Slightly further, parallel in flight) -->
+      <line x1="250" y1="322" x2="245" y2="338" stroke="#71717a" strokeWidth="4.5" />
+      <line x1="250" y1="323" x2="246" y2="337" stroke="#e4e4e7" strokeWidth="1.8" />
+      <!-- Right Claws -->
+      <path d="M 245 338 Q 240 346 236 349" stroke="#52525b" strokeWidth="3" fill="none" />
+      <path d="M 236 349 L 233 351" stroke="#18181b" strokeWidth="2" />
+      <path d="M 245 338 Q 245 349 243 353" stroke="#71717a" strokeWidth="3.2" fill="none" />
+      <path d="M 243 353 L 241 356" stroke="#18181b" strokeWidth="2" />
+      <path d="M 245 338 Q 251 348 253 352" stroke="#52525b" strokeWidth="3" fill="none" />
+      <path d="M 253 352 L 255 354" stroke="#18181b" strokeWidth="2" />
+    </g>
+
+    <!-- 5. SUNNY YELLOW HEAD & CHEEKS -->
+    <g id="head">
+      <!-- Head Circle & Crown -->
+      <circle cx="308" cy="202" r="48" fill="url(#bird-head)" stroke="#ca8a04" strokeWidth="2.5" />
+      <path
+        d="M 276 198 C 290 166 332 165 348 190 C 358 208 348 230 316 232 C 290 232 274 216 276 198 Z"
+        fill="url(#bird-head)"
+      />
+
+      <!-- Tiger Scallop Barring on nape / crown (Black budgie stripes) -->
+      <path d="M 272 178 Q 285 168 298 174" stroke="#18181b" strokeWidth="2.8" strokeLinecap="round" fill="none" opacity="0.8" />
+      <path d="M 278 190 Q 292 182 305 186" stroke="#18181b" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.8" />
+      <path d="M 284 202 Q 296 195 308 198" stroke="#18181b" strokeWidth="2.4" strokeLinecap="round" fill="none" opacity="0.75" />
+
+      <!-- Cheeks: Violet/Purple cheek patch -->
+      <ellipse cx="306" cy="222" rx="9" ry="6.5" fill="#8b5cf6" />
+      <ellipse cx="305" cy="221" rx="6" ry="4" fill="#a78bfa" opacity="0.6" />
+
+      <!-- Throat Spots (3 iconic black budgie beads) -->
+      <circle cx="288" cy="228" r="3.2" fill="#18181b" />
+      <circle cx="298" cy="234" r="3.2" fill="#18181b" />
+      <circle cx="310" cy="231" r="3.2" fill="#18181b" />
+
+      <!-- Beak & Blue Cere (Iconic male budgie bright sky blue cere) -->
+      <ellipse cx="350" cy="204" rx="9.5" ry="5.8" fill="#38bdf8" stroke="#0284c7" strokeWidth="1.2" />
+      <circle cx="347" cy="203" r="1.4" fill="#0369a1" /> <!-- nostril -->
+
+      <!-- Amber Curved Beak -->
+      <path
+        d="M 347 207 C 368 209 375 224 353 229 C 344 226 343 214 347 207 Z"
+        fill="#f59e0b"
+        stroke="#b45309"
+        strokeWidth="2"
+      />
+      <path d="M 349 209 C 362 211 366 220 352 224" fill="#fbbf24" />
+
+      <!-- Bright Lively Eye with white sparkle -->
+      <circle cx="320" cy="192" r="9.5" fill="#ffffff" />
+      <circle cx="320" cy="192" r="8.2" fill="#18181b" />
+      <circle cx="322.8" cy="189.5" r="3.2" fill="#ffffff" />
+      <circle cx="318" cy="195" r="1.4" fill="#ffffff" opacity="0.6" />
+    </g>
+
+    <!-- 6. FOREGROUND NEAR WING (Swept dynamically in power flight) -->
+    <g id="near-wing" filter="url(#wing-shadow)">
+      <!-- Wing main body & flight feathers sweep -->
+      <path
+        d="M 230 220 C 190 260 160 325 180 375 C 215 365 260 320 285 255 Z"
+        fill="url(#wing-near)"
+        stroke="#064e3b"
+        strokeWidth="2.5"
+      />
+      <!-- Secondary Flight Feathers Layers -->
+      <path
+        d="M 215 250 C 185 285 168 335 185 370 C 205 360 240 320 265 270 Z"
+        fill="#047857"
+        stroke="#022c22"
+        strokeWidth="1.8"
+      />
+      <!-- Wing Bars: Budgie signature yellow and black scalloped tiger bands -->
+      <path d="M 235 240 Q 255 255 278 245" stroke="#facc15" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+      <path d="M 230 260 Q 252 278 274 262" stroke="#052e16" strokeWidth="4.2" strokeLinecap="round" fill="none" />
+      <path d="M 225 280 Q 248 300 268 280" stroke="#facc15" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+      <path d="M 218 302 Q 240 322 258 298" stroke="#052e16" strokeWidth="4.2" strokeLinecap="round" fill="none" />
+      <path d="M 208 325 Q 228 344 245 320" stroke="#fef08a" strokeWidth="3.8" strokeLinecap="round" fill="none" />
+      <path d="M 198 348 Q 215 360 230 338" stroke="#052e16" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+
+      <!-- Feather tip definition notches -->
+      <path d="M 180 375 L 186 360" stroke="#064e3b" strokeWidth="2" />
+      <path d="M 188 358 L 196 342" stroke="#064e3b" strokeWidth="2" />
+      <path d="M 198 340 L 208 322" stroke="#064e3b" strokeWidth="2" />
+    </g>
+
+    <!-- 7. Subtle Flight Wind/Speed Streamlines -->
+    <g opacity="0.35" strokeLinecap="round">
+      <path d="M 375 170 Q 405 162 435 168" stroke="#fef08a" strokeWidth="2" strokeDasharray="6 8" />
+      <path d="M 385 245 Q 418 242 448 250" stroke="#34d399" strokeWidth="2" strokeDasharray="8 10" />
+      <path d="M 140 110 Q 110 130 90 165" stroke="#10b981" strokeWidth="2.5" strokeDasharray="10 12" />
+    </g>
+  </g>
+
+  <!-- Specular Sheen on Top Icon Border (Only for non-maskable rounded icon) -->
+  ${
+    isMaskable
+      ? ''
+      : `<path d="M 116 1.5 C 53.5 1.5 1.5 53.5 1.5 116 C 1.5 60 50 10 116 4 L 396 4 C 462 10 510.5 60 510.5 116 C 510.5 53.5 458.5 1.5 396 1.5 Z" fill="rgba(255, 255, 255, 0.08)" />`
+  }
+</svg>
+`;
+}
+
+async function main() {
+  const publicDir = path.resolve('public');
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+  }
+
+  // 1. Standard SVG icon
+  const standardSvg = getBudgieSvg({ isMaskable: false });
+  fs.writeFileSync(path.join(publicDir, 'icon.svg'), standardSvg);
+  fs.writeFileSync(path.join(publicDir, 'favicon.svg'), standardSvg);
+  console.log('Created public/icon.svg and public/favicon.svg');
+
+  // 2. Maskable SVG icon (edge to edge background, content centered in safe zone)
+  const maskableSvg = getBudgieSvg({ isMaskable: true });
+  fs.writeFileSync(path.join(publicDir, 'icon-maskable.svg'), maskableSvg);
+  console.log('Created public/icon-maskable.svg');
+
+  // 3. Render PNGs using Sharp
+  const sizes = [
+    { name: 'pwa-192x192.png', size: 192, svg: standardSvg },
+    { name: 'icon-192.png', size: 192, svg: standardSvg },
+    { name: 'pwa-512x512.png', size: 512, svg: standardSvg },
+    { name: 'icon-512.png', size: 512, svg: standardSvg },
+    { name: 'apple-touch-icon.png', size: 180, svg: standardSvg },
+    { name: 'pwa-maskable-512x512.png', size: 512, svg: maskableSvg },
+    { name: 'icon-maskable-512.png', size: 512, svg: maskableSvg },
+  ];
+
+  for (const item of sizes) {
+    const outputPath = path.join(publicDir, item.name);
+    await sharp(Buffer.from(item.svg))
+      .resize(item.size, item.size)
+      .png({ quality: 100 })
+      .toFile(outputPath);
+    console.log(`Generated ${item.name} (${item.size}x${item.size})`);
+  }
+
+  // Generate favicon.ico (32x32)
+  await sharp(Buffer.from(standardSvg))
+    .resize(32, 32)
+    .png()
+    .toFile(path.join(publicDir, 'favicon.ico'));
+  console.log('Generated favicon.ico (32x32)');
+
+  console.log('All PWA icons generated successfully!');
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,0 +1,8 @@
+{
+  "name": "Remix Budgeting 1 Firebase",
+  "description": "Aplicativo minimalista para controle de receitas, despesas e saldo financeiro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

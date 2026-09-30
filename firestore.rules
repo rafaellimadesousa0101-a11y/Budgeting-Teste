@@ -1,0 +1,169 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation helper for UserProfile
+    function isValidUserProfile(data, userId) {
+      return data.userId == userId
+        && (!('email' in data) || (data.email is string && data.email.size() <= 255))
+        && (!('name' in data) || (data.name is string && data.name.size() <= 255))
+        && (!('avatarId' in data) || (data.avatarId is string && data.avatarId.size() <= 2048))
+        && (!('birthDate' in data) || (data.birthDate is string && data.birthDate.size() <= 10))
+        && (!('theme' in data) || (data.theme in ['light', 'dark']))
+        && (!('isSketchMode' in data) || (data.isSketchMode is bool))
+        && (!('initialBalance' in data) || (data.initialBalance is number))
+        && (!('monthlyRenda' in data) || (data.monthlyRenda is map))
+        && (!('lastAcknowledgedMonth' in data) || (data.lastAcknowledgedMonth is string && data.lastAcknowledgedMonth.size() <= 7))
+        && (!('updatedAt' in data) || (data.updatedAt is number))
+        && (!('createdAt' in data) || (data.createdAt is number));
+    }
+
+    // Validation helper for Transaction
+    function isValidTransaction(data, userId) {
+      return data.userId == userId
+        && data.id is string && data.id.size() <= 128
+        && data.description is string && data.description.size() <= 150
+        && data.amount is number && data.amount >= 0
+        && data.type in ['income', 'expense']
+        && data.category is string && data.category.size() <= 64
+        && data.date is string && data.date.size() <= 10
+        && data.status in ['paid', 'pending']
+        && data.createdAt is number
+        && (!('tag' in data) || (data.tag is string && data.tag.size() <= 64))
+        && (!('isSavedBox' in data) || (data.isSavedBox is bool))
+        && (!('boxId' in data) || (data.boxId is string && data.boxId.size() <= 128));
+    }
+
+    // Validation helper for SavingBox
+    function isValidSavingBox(data, userId) {
+      return data.userId == userId
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 100
+        && data.category is string && data.category.size() <= 64
+        && data.icon is string && data.icon.size() <= 64
+        && data.currentAmount is number && data.currentAmount >= 0
+        && (!('targetAmount' in data) || (data.targetAmount is number))
+        && (!('deadlineType' in data) || (data.deadlineType in ['none', 'weeks', 'months', 'years', 'date']))
+        && (!('deadlineValue' in data) || (data.deadlineValue is number))
+        && (!('targetDate' in data) || (data.targetDate is string && data.targetDate.size() <= 10))
+        && (!('color' in data) || (data.color is string && data.color.size() <= 32))
+        && (!('isFinalized' in data) || (data.isFinalized is bool))
+        && (!('finalizedAt' in data) || (data.finalizedAt is number))
+        && data.createdAt is number;
+    }
+
+    // Validation helper for AiConversation
+    function isValidAiConversation(data, userId) {
+      return data.userId == userId
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 120
+        && (!('lastMessage' in data) || (data.lastMessage is string && data.lastMessage.size() <= 300))
+        && data.messages is list
+        && data.createdAt is number
+        && data.updatedAt is number;
+    }
+
+    // Match users collection
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Blanket user listing forbidden
+
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().userId == request.auth.uid;
+
+      allow update: if isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().userId == request.auth.uid;
+
+      allow delete: if isOwner(userId);
+
+      // Subcollection: Transactions
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && isValidId(transactionId)
+          && isValidTransaction(incoming(), userId)
+          && incoming().id == transactionId
+          && incoming().userId == request.auth.uid;
+
+        allow update: if isOwner(userId)
+          && isValidId(transactionId)
+          && isValidTransaction(incoming(), userId)
+          && incoming().id == transactionId
+          && incoming().userId == request.auth.uid;
+
+        allow delete: if isOwner(userId) && isValidId(transactionId);
+      }
+
+      // Subcollection: Saving Boxes
+      match /savingBoxes/{boxId} {
+        allow get: if isOwner(userId) && isValidId(boxId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && isValidId(boxId)
+          && isValidSavingBox(incoming(), userId)
+          && incoming().id == boxId
+          && incoming().userId == request.auth.uid;
+
+        allow update: if isOwner(userId)
+          && isValidId(boxId)
+          && isValidSavingBox(incoming(), userId)
+          && incoming().id == boxId
+          && incoming().userId == request.auth.uid;
+
+        allow delete: if isOwner(userId) && isValidId(boxId);
+      }
+
+      // Subcollection: AI Conversations History
+      match /aiConversations/{conversationId} {
+        allow get: if isOwner(userId) && isValidId(conversationId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && isValidId(conversationId)
+          && isValidAiConversation(incoming(), userId)
+          && incoming().id == conversationId
+          && incoming().userId == request.auth.uid;
+
+        allow update: if isOwner(userId)
+          && isValidId(conversationId)
+          && isValidAiConversation(incoming(), userId)
+          && incoming().id == conversationId
+          && incoming().userId == request.auth.uid;
+
+        allow delete: if isOwner(userId) && isValidId(conversationId);
+      }
+    }
+  }
+}

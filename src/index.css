@@ -1,0 +1,816 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html, body {
+    overflow-x: hidden;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Padronização dos textos de exemplo (placeholders): tamanho harmonizado (text-xs / 12px) */
+  ::placeholder,
+  input::placeholder,
+  textarea::placeholder {
+    font-family: 'Roboto', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 0.75rem !important; /* 12px, idêntico a text-xs de "Meta financeira (opcional)" */
+    font-style: normal !important;
+    line-height: normal !important;
+  }
+}
+
+/* ==========================================================================
+   Animações fluidas e orgânicas de entrada das letras do título 'Budgeting'
+   (Tropeço com inércia, deslize na base, impulso de recuperação e acomodação elástica)
+   ========================================================================== */
+
+@keyframes organicStumble1 {
+  0% {
+    transform: translate3d(-260px, -6px, 0) rotate(8deg);
+    opacity: 0;
+  }
+  16% {
+    transform: translate3d(-170px, -2px, 0) rotate(14deg);
+    opacity: 1;
+  }
+  32% {
+    /* Tropeço: base desacelera e o topo avança */
+    transform: translate3d(-90px, 8px, 0) rotate(26deg);
+  }
+  46% {
+    /* Cai e amortece o contato na base */
+    transform: translate3d(-30px, 13px, 0) rotate(36deg) scale(1.06, 0.92);
+  }
+  60% {
+    /* Se levanta: impulso elástico em arco */
+    transform: translate3d(12px, -14px, 0) rotate(-16deg) scale(1, 1);
+  }
+  74% {
+    /* Pousa os pés avançando levemente com a inércia */
+    transform: translate3d(7px, 3px, 0) rotate(7deg);
+  }
+  86% {
+    /* Oscilação de correção para trás */
+    transform: translate3d(-3px, -1px, 0) rotate(-3.5deg);
+  }
+  94% {
+    /* Micro amortecimento */
+    transform: translate3d(1px, 0, 0) rotate(1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes organicStumble2 {
+  0% {
+    transform: translate3d(-280px, 4px, 0) rotate(-10deg);
+    opacity: 0;
+  }
+  18% {
+    transform: translate3d(-180px, 0, 0) rotate(-4deg);
+    opacity: 1;
+  }
+  34% {
+    /* Tropeça escorregando para a frente */
+    transform: translate3d(-105px, 10px, 0) rotate(-18deg);
+  }
+  48% {
+    /* Deslize rente à base com apoio */
+    transform: translate3d(-40px, 14px, 0) rotate(-28deg) scale(1.05, 0.93);
+  }
+  62% {
+    /* Tronco se ergue para recuperar o eixo */
+    transform: translate3d(10px, -12px, 0) rotate(14deg);
+  }
+  75% {
+    /* Aterrissagem com peso à frente */
+    transform: translate3d(-5px, 3px, 0) rotate(-6deg);
+  }
+  87% {
+    /* Retorno suave ao centro */
+    transform: translate3d(2.5px, -1px, 0) rotate(3deg);
+  }
+  95% {
+    transform: translate3d(-1px, 0, 0) rotate(-1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes organicStumble3 {
+  0% {
+    transform: translate3d(-250px, -10px, 0) rotate(12deg);
+    opacity: 0;
+  }
+  16% {
+    transform: translate3d(-160px, -3px, 0) rotate(18deg);
+    opacity: 1;
+  }
+  32% {
+    /* Tropeço com inclinação mais acentuada */
+    transform: translate3d(-85px, 9px, 0) rotate(32deg);
+  }
+  48% {
+    /* Cai de lado e amortece na linha base */
+    transform: translate3d(-25px, 15px, 0) rotate(42deg) scale(1.08, 0.9);
+  }
+  62% {
+    /* Salto fluido para se erguer */
+    transform: translate3d(14px, -16px, 0) rotate(-18deg);
+  }
+  76% {
+    /* Toca o solo buscando equilíbrio */
+    transform: translate3d(8px, 4px, 0) rotate(8deg);
+  }
+  88% {
+    /* Balanço pendular de acomodação */
+    transform: translate3d(-3.5px, -1px, 0) rotate(-4deg);
+  }
+  95% {
+    transform: translate3d(1px, 0, 0) rotate(1.5deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes organicStumble4 {
+  0% {
+    transform: translate3d(-270px, 0, 0) rotate(6deg);
+    opacity: 0;
+  }
+  18% {
+    transform: translate3d(-175px, 2px, 0) rotate(12deg);
+    opacity: 1;
+  }
+  34% {
+    /* Tropeço e derrapagem controlada */
+    transform: translate3d(-95px, 11px, 0) rotate(24deg);
+  }
+  48% {
+    /* Deslize longo e toque no chão */
+    transform: translate3d(-32px, 14px, 0) rotate(30deg) scale(1.07, 0.92);
+  }
+  62% {
+    /* Ergue-se com elasticidade natural */
+    transform: translate3d(8px, -11px, 0) rotate(-12deg);
+  }
+  76% {
+    /* Encontra o seu lugar e amortece */
+    transform: translate3d(5px, 2.5px, 0) rotate(5deg);
+  }
+  88% {
+    /* Alinhamento final */
+    transform: translate3d(-2px, -0.5px, 0) rotate(-2.5deg);
+  }
+  95% {
+    transform: translate3d(0.8px, 0, 0) rotate(0.8deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Easter Egg: Transformação Budgeting <-> Budgie e Voo do Periquito
+   ========================================================================== */
+
+/* Queda fluida e natural das letras T, N, G para fora da tela */
+@keyframes letterCollapseAndFall {
+  0% {
+    max-width: 38px;
+    margin-right: 0px;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  14% {
+    /* Pequeno salto para cima como se soltasse do chão */
+    max-width: 38px;
+    transform: translate3d(0, -14px, 0) rotate(-10deg);
+    opacity: 1;
+  }
+  38% {
+    /* Gravidade puxa para baixo com rotação natural */
+    max-width: 38px;
+    transform: translate3d(6px, 18vh, 0) rotate(28deg);
+    opacity: 1;
+  }
+  65% {
+    /* Deslizando para o fundo da tela enquanto a largura contrai suavemente */
+    max-width: 20px;
+    transform: translate3d(16px, 60vh, 0) rotate(80deg);
+    opacity: 0.9;
+  }
+  100% {
+    /* Ultrapassa a borda inferior da tela e some */
+    max-width: 0px;
+    margin-right: -2px;
+    transform: translate3d(28px, 125vh, 0) rotate(145deg);
+    opacity: 0;
+  }
+}
+
+/* Queda despencando do alto das letras T, N, G */
+@keyframes letterPlungeFromSky {
+  0% {
+    max-width: 0px;
+    margin-right: -2px;
+    transform: translate3d(0, -120vh, 0) rotate(-60deg);
+    opacity: 0;
+  }
+  20% {
+    max-width: 38px;
+    margin-right: 0px;
+    transform: translate3d(0, -50vh, 0) rotate(-35deg);
+    opacity: 1;
+  }
+  70% {
+    max-width: 38px;
+    margin-right: 0px;
+    transform: translate3d(0, 16px, 0) rotate(12deg);
+    opacity: 1;
+  }
+  82% {
+    max-width: 38px;
+    transform: translate3d(0, -6px, 0) rotate(-4deg) scale(1.05);
+    opacity: 1;
+  }
+  92% {
+    max-width: 38px;
+    transform: translate3d(0, 2px, 0) rotate(1deg);
+    opacity: 1;
+  }
+  100% {
+    max-width: 38px;
+    margin-right: 0px;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Reorganização de E e I para formar 'Budgie' */
+@keyframes letterSwapI {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  45% {
+    transform: translate3d(-16px, -15px, 0) rotate(-12deg);
+  }
+  80% {
+    transform: translate3d(-30px, 2px, 0) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(-32px, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes letterSwapE {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  45% {
+    transform: translate3d(16px, 12px, 0) rotate(10deg);
+  }
+  80% {
+    transform: translate3d(30px, -2px, 0) rotate(-2deg);
+  }
+  100% {
+    transform: translate3d(32px, 0, 0) rotate(0deg);
+  }
+}
+
+/* Reorganização reversa de I e E para voltar a 'Budgeting' */
+@keyframes letterReturnI {
+  0% {
+    transform: translate3d(-32px, 0, 0);
+  }
+  50% {
+    transform: translate3d(-14px, -10px, 0) rotate(8deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes letterReturnE {
+  0% {
+    transform: translate3d(32px, 0, 0);
+  }
+  50% {
+    transform: translate3d(14px, 10px, 0) rotate(-8deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+/* Voo livre e acrobático do periquito verde com exatamente 3 voltas completas por toda a tela antes de pousar */
+@keyframes budgieFlightExtended {
+  /* 0%: Surge voando em subida rápida vindo do canto inferior da tela */
+  0% {
+    transform: translate3d(36vw, 80vh, 0) scale(0.65) scaleX(-1) rotate(26deg);
+    opacity: 0;
+  }
+  2% {
+    transform: translate3d(30vw, 65vh, 0) scale(0.8) scaleX(-1) rotate(22deg);
+    opacity: 1;
+  }
+
+  /* === VOLTA 1 (2% a 34%): Grande arco ascendente da direita até o canto superior esquerdo e descida cruzada === */
+  7% {
+    transform: translate3d(10vw, 42vh, 0) scale(0.95) scaleX(-1) rotate(16deg);
+  }
+  13% {
+    transform: translate3d(-18vw, 24vh, 0) scale(1.08) scaleX(-1) rotate(10deg);
+  }
+  19% {
+    transform: translate3d(-38vw, 4vh, 0) scale(1.15) scaleX(-1) rotate(-4deg);
+  }
+  23% {
+    transform: translate3d(-40vw, -14vh, 0) scale(1.16) scaleX(-0.2) rotate(-16deg);
+  }
+  27% {
+    transform: translate3d(-24vw, -16vh, 0) scale(1.16) scaleX(1) rotate(8deg);
+  }
+  31% {
+    transform: translate3d(6vw, 10vh, 0) scale(1.12) scaleX(1) rotate(24deg);
+  }
+  34% {
+    transform: translate3d(34vw, 36vh, 0) scale(1.08) scaleX(1) rotate(16deg);
+  }
+
+  /* === VOLTA 2 (34% a 66%): Looping acrobático amplo à direita, sobrevoo por cima de toda a tela e mergulho central === */
+  39% {
+    transform: translate3d(44vw, 30vh, 0) scale(1.1) scaleX(1) rotate(-18deg);
+  }
+  44% {
+    transform: translate3d(38vw, -8vh, 0) scale(1.15) scaleX(0.4) rotate(-26deg);
+  }
+  48% {
+    transform: translate3d(20vw, -16vh, 0) scale(1.18) scaleX(-1) rotate(-6deg);
+  }
+  53% {
+    transform: translate3d(-14vw, -15vh, 0) scale(1.16) scaleX(-1) rotate(4deg);
+  }
+  58% {
+    transform: translate3d(-36vw, 6vh, 0) scale(1.12) scaleX(-1) rotate(20deg);
+  }
+  62% {
+    transform: translate3d(-24vw, 36vh, 0) scale(1.08) scaleX(0.2) rotate(10deg);
+  }
+  66% {
+    transform: translate3d(-2vw, 32vh, 0) scale(1.1) scaleX(1) rotate(-12deg);
+  }
+
+  /* === VOLTA 3 (66% a 90%): Arco de aproximação ao redor do cabeçalho com inspeção para pouso === */
+  71% {
+    transform: translate3d(22vw, 10vh, 0) scale(1.12) scaleX(1) rotate(-22deg);
+  }
+  76% {
+    transform: translate3d(28vw, -12vh, 0) scale(1.12) scaleX(0.3) rotate(-16deg);
+  }
+  81% {
+    transform: translate3d(12vw, -16vh, 0) scale(1.1) scaleX(-1) rotate(6deg);
+  }
+  86% {
+    transform: translate3d(-12vw, -10vh, 0) scale(1.06) scaleX(-1) rotate(-2deg);
+  }
+  90% {
+    transform: translate3d(-3vw, -5vh, 0) scale(1.04) scaleX(0.5) rotate(4deg);
+  }
+
+  /* === POUSO FINAL (90% a 100%): Desaceleração, alinhamento e pouso perfeito sobre a letra G === */
+  94% {
+    transform: translate3d(2vw, -22px, 0) scale(1.01) scaleX(1) rotate(-6deg);
+  }
+  97% {
+    transform: translate3d(0, -4px, 0) scale(1.0) scaleX(1) rotate(-2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.0) scaleX(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Voo de partida do periquito quando clicado para voltar */
+@keyframes budgieFlyAway {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) scaleX(1) rotate(0deg);
+    opacity: 1;
+  }
+  20% {
+    transform: translate3d(-10vw, -12vh, 0) scale(1.05) scaleX(-1) rotate(15deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(-35vw, -30vh, 0) scale(0.9) scaleX(-1) rotate(25deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-60vw, -80vh, 0) scale(0.4) scaleX(-1) rotate(35deg);
+    opacity: 0;
+  }
+}
+
+/* Batimento de asas natural durante o voo */
+@keyframes budgieWingFlap {
+  0% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  100% {
+    transform: scaleY(-0.65) rotate(36deg);
+  }
+}
+
+/* Batimento da asa oposta em profundidade */
+@keyframes budgieFarWingFlap {
+  0% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  100% {
+    transform: scaleY(-0.55) rotate(-22deg);
+  }
+}
+
+/* Respiração e balanço sutil do periquito pousado exatamente sobre o topo da letra */
+@keyframes budgieIdle {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0) rotate(1.2deg);
+  }
+}
+
+/* ==========================================================================
+   MODO FEITO A MÃO COM LÁPIS SOBRE FOLHA TOTALMENTE EM BRANCO (PENCIL SKETCH)
+   Transforma todo o layout para desenho livre a lápis de grafite sobre papel
+   ========================================================================== */
+
+html.sketch-mode,
+body.sketch-mode,
+.sketch-mode {
+  --sketch-pencil: #18181b;
+  --sketch-graphite: #27272a;
+  --sketch-lead: #3f3f46;
+  --sketch-shading: #71717a;
+  --sketch-paper: #ffffff;
+  
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  font-family: 'Patrick Hand', 'Architects Daughter', 'Caveat', cursive, sans-serif !important;
+  font-size: 1.03rem;
+  letter-spacing: 0.02em;
+}
+
+/* Aplicação de fonte manuscrita para todos os elementos no modo lápis */
+.sketch-mode *,
+html.sketch-mode * {
+  font-family: 'Patrick Hand', 'Architects Daughter', 'Caveat', cursive, sans-serif !important;
+}
+
+/* A folha é totalmente em branco */
+html.sketch-mode body,
+.sketch-mode body,
+.sketch-mode main,
+.sketch-mode div[class*="min-h-screen"] {
+  background-color: #ffffff !important;
+  background-image: radial-gradient(rgba(24, 24, 27, 0.04) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+}
+
+/* Cartões e containers com traço a lápis e cantos orgânicos desenhados a mão */
+.sketch-mode div[class*="rounded-2xl"],
+.sketch-mode div[class*="rounded-3xl"],
+.sketch-mode div[class*="rounded-xl"]:not(button):not(input),
+.sketch-mode section[class*="rounded-"],
+.sketch-mode aside[class*="rounded-"] {
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  border: 1.8px solid #27272a !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+  box-shadow: 2px 3px 0px #18181b, 0.5px 0.5px 0px #52525b !important;
+}
+
+/* Botões com estilo de esboço a lápis */
+.sketch-mode button {
+  border: 1.6px solid #27272a !important;
+  border-radius: 255px 20px 225px 20px / 20px 225px 20px 255px !important;
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  box-shadow: 1.5px 2px 0px #27272a !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.sketch-mode button:hover {
+  transform: translate(-1px, -1.5px) !important;
+  box-shadow: 2.5px 3.5px 0px #18181b !important;
+}
+
+.sketch-mode button:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 0px 0px 0px #18181b !important;
+}
+
+/* Botões primários destacados (preenchimento grafite escuro com escrita branca) */
+.sketch-mode button[class*="bg-zinc-900"],
+.sketch-mode button[class*="bg-emerald-600"],
+.sketch-mode button[type="submit"] {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+  border: 1.8px solid #09090b !important;
+}
+
+.sketch-mode button[class*="bg-zinc-900"] *,
+.sketch-mode button[class*="bg-emerald-600"] *,
+.sketch-mode button[type="submit"] * {
+  color: #ffffff !important;
+}
+
+/* Campos de entrada e texto (Inputs e Selects desenhados a mão) */
+.sketch-mode input,
+.sketch-mode select,
+.sketch-mode textarea {
+  background-color: #ffffff !important;
+  color: #18181b !important;
+  border: 1.6px solid #27272a !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.06), 1.5px 2px 0px #27272a !important;
+}
+
+.sketch-mode input::placeholder,
+.sketch-mode textarea::placeholder {
+  color: #71717a !important;
+  font-style: italic !important;
+}
+
+.sketch-mode input:focus,
+.sketch-mode select:focus,
+.sketch-mode textarea:focus {
+  outline: none !important;
+  border-color: #09090b !important;
+  box-shadow: 2px 3px 0px #09090b !important;
+}
+
+/* Badges, tags e filtros */
+.sketch-mode span[class*="rounded-full"],
+.sketch-mode span[class*="rounded-lg"],
+.sketch-mode span[class*="rounded-md"] {
+  border: 1.2px solid #3f3f46 !important;
+  border-radius: 255px 20px 225px 20px / 20px 225px 20px 255px !important;
+}
+
+/* Modais e janelas sobrepostas no modo lápis */
+.sketch-mode .fixed.inset-0 > div,
+.sketch-mode [role="dialog"],
+.sketch-mode div[class*="max-w-"] > div[class*="bg-white"] {
+  background-color: #ffffff !important;
+  border: 2px solid #18181b !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+  box-shadow: 4px 6px 0px #18181b !important;
+}
+
+/* Backdrop translúcido de papel */
+.sketch-mode .fixed.inset-0.bg-black\/60,
+.sketch-mode .fixed.inset-0.bg-black\/50,
+.sketch-mode .fixed.inset-0.bg-black\/40 {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Divisores e linhas como traço de régua e lápis */
+.sketch-mode hr,
+.sketch-mode [class*="border-t"],
+.sketch-mode [class*="border-b"],
+.sketch-mode [class*="border-zinc-200"],
+.sketch-mode [class*="border-zinc-100"] {
+  border-color: #3f3f46 !important;
+}
+
+/* Barra de rolagem e detalhes sutis de rascunho */
+.sketch-mode ::selection {
+  background-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+
+/* ==========================================================================
+   MODO ESCURO NO LAYOUT FEITO A MÃO (INVERSÃO DE PRETO PELO BRANCO)
+   Folha escura / ardósia com traços e escrita a lápis branco / giz
+   ========================================================================== */
+
+html.dark.sketch-mode,
+body.dark.sketch-mode,
+.dark.sketch-mode,
+html.dark .sketch-mode {
+  --sketch-pencil: #ffffff;
+  --sketch-graphite: #f4f4f5;
+  --sketch-lead: #e4e4e7;
+  --sketch-shading: #a1a1aa;
+  --sketch-paper: #09090b;
+
+  background-color: #09090b !important;
+  color: #fafafa !important;
+}
+
+html.dark.sketch-mode body,
+.dark.sketch-mode body,
+.dark.sketch-mode main,
+html.dark.sketch-mode div[class*="min-h-screen"],
+.dark.sketch-mode div[class*="min-h-screen"],
+html.dark .sketch-mode div[class*="min-h-screen"] {
+  background-color: #09090b !important;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+  color: #fafafa !important;
+}
+
+/* Cartões e containers escuros com traço a lápis branco */
+html.dark.sketch-mode div[class*="rounded-2xl"],
+html.dark.sketch-mode div[class*="rounded-3xl"],
+html.dark.sketch-mode div[class*="rounded-xl"]:not(button):not(input),
+html.dark.sketch-mode section[class*="rounded-"],
+html.dark.sketch-mode aside[class*="rounded-"],
+.dark.sketch-mode div[class*="rounded-2xl"],
+.dark.sketch-mode div[class*="rounded-3xl"],
+.dark.sketch-mode div[class*="rounded-xl"]:not(button):not(input),
+.dark.sketch-mode section[class*="rounded-"],
+.dark.sketch-mode aside[class*="rounded-"] {
+  background-color: #09090b !important;
+  color: #fafafa !important;
+  border: 1.8px solid #f4f4f5 !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+  box-shadow: 2px 3px 0px #ffffff, 0.5px 0.5px 0px #a1a1aa !important;
+}
+
+/* Botões com estilo de esboço a lápis branco sobre papel escuro */
+html.dark.sketch-mode button,
+.dark.sketch-mode button {
+  border: 1.6px solid #e4e4e7 !important;
+  border-radius: 255px 20px 225px 20px / 20px 225px 20px 255px !important;
+  background-color: #09090b !important;
+  color: #fafafa !important;
+  box-shadow: 1.5px 2px 0px #ffffff !important;
+}
+
+html.dark.sketch-mode button:hover,
+.dark.sketch-mode button:hover {
+  transform: translate(-1px, -1.5px) !important;
+  box-shadow: 2.5px 3.5px 0px #ffffff !important;
+}
+
+html.dark.sketch-mode button:active,
+.dark.sketch-mode button:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 0px 0px 0px #ffffff !important;
+}
+
+/* Botões primários destacados no modo escuro invertido (fundo branco com texto/ícone preto) */
+html.dark.sketch-mode button[class*="bg-zinc-900"],
+html.dark.sketch-mode button[class*="bg-emerald-600"],
+html.dark.sketch-mode button[type="submit"],
+.dark.sketch-mode button[class*="bg-zinc-900"],
+.dark.sketch-mode button[class*="bg-emerald-600"],
+.dark.sketch-mode button[type="submit"] {
+  background-color: #ffffff !important;
+  color: #09090b !important;
+  border: 1.8px solid #ffffff !important;
+}
+
+html.dark.sketch-mode button[class*="bg-zinc-900"] *,
+html.dark.sketch-mode button[class*="bg-emerald-600"] *,
+html.dark.sketch-mode button[type="submit"] *,
+.dark.sketch-mode button[class*="bg-zinc-900"] *,
+.dark.sketch-mode button[class*="bg-emerald-600"] *,
+.dark.sketch-mode button[type="submit"] * {
+  color: #09090b !important;
+}
+
+/* Campos de entrada e texto (Inputs e Selects no modo escuro invertido) */
+html.dark.sketch-mode input,
+html.dark.sketch-mode select,
+html.dark.sketch-mode textarea,
+.dark.sketch-mode input,
+.dark.sketch-mode select,
+.dark.sketch-mode textarea {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  border: 1.6px solid #e4e4e7 !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.06), 1.5px 2px 0px #ffffff !important;
+}
+
+html.dark.sketch-mode input::placeholder,
+html.dark.sketch-mode textarea::placeholder,
+.dark.sketch-mode input::placeholder,
+.dark.sketch-mode textarea::placeholder {
+  color: #a1a1aa !important;
+  font-style: italic !important;
+}
+
+html.dark.sketch-mode input:focus,
+html.dark.sketch-mode select:focus,
+html.dark.sketch-mode textarea:focus,
+.dark.sketch-mode input:focus,
+.dark.sketch-mode select:focus,
+.dark.sketch-mode textarea:focus {
+  outline: none !important;
+  border-color: #ffffff !important;
+  box-shadow: 2px 3px 0px #ffffff !important;
+}
+
+/* Badges e tags */
+html.dark.sketch-mode span[class*="rounded-full"],
+html.dark.sketch-mode span[class*="rounded-lg"],
+html.dark.sketch-mode span[class*="rounded-md"],
+.dark.sketch-mode span[class*="rounded-full"],
+.dark.sketch-mode span[class*="rounded-lg"],
+.dark.sketch-mode span[class*="rounded-md"] {
+  border: 1.2px solid #e4e4e7 !important;
+  color: #fafafa !important;
+}
+
+/* Modais e janelas sobrepostas */
+html.dark.sketch-mode .fixed.inset-0 > div,
+html.dark.sketch-mode [role="dialog"],
+html.dark.sketch-mode div[class*="max-w-"] > div[class*="bg-white"],
+html.dark.sketch-mode div[class*="max-w-"] > div[class*="bg-zinc-900"],
+.dark.sketch-mode .fixed.inset-0 > div,
+.dark.sketch-mode [role="dialog"] {
+  background-color: #09090b !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 4px 6px 0px #ffffff !important;
+  color: #fafafa !important;
+}
+
+/* Backdrop escuro no modo escuro */
+html.dark.sketch-mode .fixed.inset-0.bg-black\/60,
+html.dark.sketch-mode .fixed.inset-0.bg-black\/50,
+html.dark.sketch-mode .fixed.inset-0.bg-black\/40,
+.dark.sketch-mode .fixed.inset-0.bg-black\/60,
+.dark.sketch-mode .fixed.inset-0.bg-black\/50,
+.dark.sketch-mode .fixed.inset-0.bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Divisores e linhas como traço a lápis branco/cinza */
+html.dark.sketch-mode hr,
+html.dark.sketch-mode [class*="border-t"],
+html.dark.sketch-mode [class*="border-b"],
+html.dark.sketch-mode [class*="border-zinc-200"],
+html.dark.sketch-mode [class*="border-zinc-800"],
+.dark.sketch-mode hr,
+.dark.sketch-mode [class*="border-t"],
+.dark.sketch-mode [class*="border-b"],
+.dark.sketch-mode [class*="border-zinc-800"] {
+  border-color: #52525b !important;
+}
+
+/* Textos e contrastes no modo escuro invertido */
+html.dark.sketch-mode p,
+html.dark.sketch-mode span,
+html.dark.sketch-mode label,
+html.dark.sketch-mode h1,
+html.dark.sketch-mode h2,
+html.dark.sketch-mode h3,
+.dark.sketch-mode p,
+.dark.sketch-mode span,
+.dark.sketch-mode label,
+.dark.sketch-mode h1,
+.dark.sketch-mode h2,
+.dark.sketch-mode h3 {
+  color: inherit;
+}
+
+html.dark.sketch-mode .text-zinc-500,
+html.dark.sketch-mode .text-zinc-400,
+html.dark.sketch-mode .dark\:text-zinc-400,
+.dark.sketch-mode .text-zinc-500,
+.dark.sketch-mode .text-zinc-400 {
+  color: #a1a1aa !important;
+}
+
+html.dark.sketch-mode .text-zinc-900,
+html.dark.sketch-mode .text-zinc-800,
+html.dark.sketch-mode .text-zinc-700,
+.dark.sketch-mode .text-zinc-900,
+.dark.sketch-mode .text-zinc-800 {
+  color: #fafafa !important;
+}
+
+/* Barra de rolagem e seleção no modo escuro */
+html.dark.sketch-mode ::selection,
+.dark.sketch-mode ::selection {
+  background-color: #3f3f46 !important;
+  color: #ffffff !important;
+}
+
+

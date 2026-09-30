@@ -1,0 +1,262 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile preferences, initial balances and monthly metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier of the user matching Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User Google email address",
+          "maxLength": 255
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the user",
+          "maxLength": 120
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Selected avatar identifier or custom photo URL",
+          "maxLength": 512
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "Date of birth in YYYY-MM-DD format",
+          "maxLength": 10
+        },
+        "theme": {
+          "type": "string",
+          "description": "Visual theme light or dark",
+          "enum": ["light", "dark"]
+        },
+        "isSketchMode": {
+          "type": "boolean",
+          "description": "Hand-drawn sketch theme toggle"
+        },
+        "initialBalance": {
+          "type": "number",
+          "description": "Initial monthly balance base value"
+        },
+        "monthlyRenda": {
+          "type": "object",
+          "description": "Monthly income map keyed by YYYY-MM"
+        },
+        "lastAcknowledgedMonth": {
+          "type": "string",
+          "description": "Last month acknowledged by user in YYYY-MM format",
+          "maxLength": 7
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Timestamp of the last update"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp of profile creation"
+        }
+      },
+      "required": ["userId", "email"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial entry: income, paid expense or pending bill",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique transaction ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "description": {
+          "type": "string",
+          "description": "Transaction title or description",
+          "maxLength": 150
+        },
+        "amount": {
+          "type": "number",
+          "description": "Positive monetary amount"
+        },
+        "type": {
+          "type": "string",
+          "description": "Income or expense",
+          "enum": ["income", "expense"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Category identifier",
+          "maxLength": 64
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO date YYYY-MM-DD",
+          "maxLength": 10
+        },
+        "status": {
+          "type": "string",
+          "description": "Payment status: paid or pending",
+          "enum": ["paid", "pending"]
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Optional categorization tag",
+          "maxLength": 64
+        },
+        "isSavedBox": {
+          "type": "boolean",
+          "description": "True if allocated to a saving box"
+        },
+        "boxId": {
+          "type": "string",
+          "description": "Referenced saving box ID",
+          "maxLength": 128
+        }
+      },
+      "required": ["id", "userId", "description", "amount", "type", "category", "date", "createdAt"]
+    },
+    "SavingBox": {
+      "title": "SavingBox",
+      "description": "Financial target or saving piggybank",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique box identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the saving box",
+          "maxLength": 100
+        },
+        "category": {
+          "type": "string",
+          "description": "Category identifier or custom name",
+          "maxLength": 64
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon identifier",
+          "maxLength": 64
+        },
+        "currentAmount": {
+          "type": "number",
+          "description": "Accumulated saved amount"
+        },
+        "targetAmount": {
+          "type": "number",
+          "description": "Optional goal target value"
+        },
+        "deadlineType": {
+          "type": "string",
+          "description": "Deadline classification",
+          "enum": ["none", "weeks", "months", "years", "date"]
+        },
+        "deadlineValue": {
+          "type": "number",
+          "description": "Value associated with deadline type"
+        },
+        "targetDate": {
+          "type": "string",
+          "description": "Target date string YYYY-MM-DD",
+          "maxLength": 10
+        },
+        "color": {
+          "type": "string",
+          "description": "Custom color hex or code",
+          "maxLength": 32
+        },
+        "isFinalized": {
+          "type": "boolean",
+          "description": "Flag indicating if box goal has been achieved or closed"
+        },
+        "finalizedAt": {
+          "type": "number",
+          "description": "Timestamp when box was finalized"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds"
+        }
+      },
+      "required": ["id", "userId", "name", "category", "icon", "currentAmount", "createdAt"]
+    },
+    "AiConversation": {
+      "title": "AiConversation",
+      "description": "Financial AI Assistant conversation history thread",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique conversation thread identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Title or topic of the conversation",
+          "maxLength": 120
+        },
+        "lastMessage": {
+          "type": "string",
+          "description": "Preview of last message",
+          "maxLength": 300
+        },
+        "messages": {
+          "type": "array",
+          "description": "List of messages in the conversation thread"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last updated timestamp in milliseconds"
+        }
+      },
+      "required": ["id", "userId", "title", "createdAt", "updatedAt", "messages"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Personal user document containing preferences and global settings"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Collection of transactions created by the authenticated user"
+    },
+    "/users/{userId}/savingBoxes/{boxId}": {
+      "schema": "SavingBox",
+      "description": "Collection of savings boxes and financial goals created by the authenticated user"
+    },
+    "/users/{userId}/aiConversations/{conversationId}": {
+      "schema": "AiConversation",
+      "description": "Collection of financial AI chat conversation threads created by the authenticated user"
+    }
+  }
+}
