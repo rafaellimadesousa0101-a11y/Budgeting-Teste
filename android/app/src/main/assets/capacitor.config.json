@@ -1,0 +1,8 @@
+{
+	"appId": "com.budgeting.financial",
+	"appName": "Budgeting",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	}
+}

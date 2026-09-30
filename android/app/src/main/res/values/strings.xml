@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Budgeting</string>
+    <string name="title_activity_main">Budgeting</string>
+    <string name="package_name">com.budgeting.financial</string>
+    <string name="custom_url_scheme">com.budgeting.financial</string>
+</resources>

@@ -1,6 +1,10 @@
 name: Build Android APK
 
 on:
+  push:
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -13,7 +17,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: 'npm'
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -22,29 +27,26 @@ jobs:
           java-version: '21'
 
       - name: Install dependencies
-        run: |
-          npm install --force
-          npm install @capacitor/core @capacitor/cli @capacitor/android --force
+        run: npm ci || npm install
 
-      - name: Build Web Assets
-        run: |
-          npm run build || (mkdir -p dist && cp -r src/* dist/) || true
+      - name: Build Web Application
+        run: npm run build
 
-      - name: Prepare Capacitor Android
-        run: |
-          npx cap init "Budgeting" "com.budgeting.app" --web-dir dist || true
-          rm -rf android
-          npx cap add android
-          npx cap sync android
+      - name: Sync Capacitor Android
+        run: npx cap sync android
 
-      - name: Build APK with Gradle
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK with Gradle
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
+      - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: budgeting-apk
           path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
