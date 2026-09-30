@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -22,12 +22,9 @@ jobs:
       - name: Build Web Project
         run: bun run build
 
-      - name: Generate Fresh Android Project
+      - name: Sync Capacitor Android Platform
         run: |
-          bun add @capacitor/core @capacitor/cli @capacitor/android
-          rm -rf android
-          bunx cap init "Meu App" "com.rafael.app" --web-dir dist --force || true
-          bunx cap add android
+          bunx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -39,10 +36,11 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30

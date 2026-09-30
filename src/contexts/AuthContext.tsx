@@ -5,7 +5,15 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { type User, onAuthStateChanged } from 'firebase/auth';
-import { auth, loginWithGoogle, logoutUser, testConnection } from '../firebase.ts';
+import {
+  auth,
+  loginWithGoogle,
+  loginWithEmail,
+  registerWithEmail,
+  loginAnonymously,
+  logoutUser,
+  testConnection,
+} from '../firebase.ts';
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +22,9 @@ interface AuthContextType {
   isSyncing: boolean;
   setIsSyncing: (val: boolean) => void;
   loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, pass: string) => Promise<void>;
+  registerWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
+  loginAnonymously: () => Promise<void>;
   logout: () => Promise<void>;
   authError: string | null;
   clearAuthError: () => void;
@@ -67,16 +78,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const handleLogin = useCallback(async () => {
+  const handleLoginGoogle = useCallback(async () => {
     setAuthError(null);
     try {
       await loginWithGoogle();
     } catch (err: any) {
       if (err?.code === 'auth/popup-closed-by-user') {
-        // User closed popup, do not show fatal error
         return;
       }
       setAuthError(err?.message || 'Erro ao autenticar com o Google.');
+      throw err;
+    }
+  }, []);
+
+  const handleLoginEmail = useCallback(async (email: string, pass: string) => {
+    setAuthError(null);
+    try {
+      await loginWithEmail(email, pass);
+    } catch (err: any) {
+      setAuthError(err?.message || 'Erro ao autenticar com e-mail.');
+      throw err;
+    }
+  }, []);
+
+  const handleRegisterEmail = useCallback(async (email: string, pass: string, name?: string) => {
+    setAuthError(null);
+    try {
+      await registerWithEmail(email, pass, name);
+    } catch (err: any) {
+      setAuthError(err?.message || 'Erro ao criar conta.');
+      throw err;
+    }
+  }, []);
+
+  const handleLoginAnonymous = useCallback(async () => {
+    setAuthError(null);
+    try {
+      await loginAnonymously();
+    } catch (err: any) {
+      setAuthError(err?.message || 'Erro ao entrar como convidado.');
       throw err;
     }
   }, []);
@@ -103,7 +143,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isOnline,
         isSyncing,
         setIsSyncing,
-        loginWithGoogle: handleLogin,
+        loginWithGoogle: handleLoginGoogle,
+        loginWithEmail: handleLoginEmail,
+        registerWithEmail: handleRegisterEmail,
+        loginAnonymously: handleLoginAnonymous,
         logout: handleLogout,
         authError,
         clearAuthError,
@@ -114,10 +157,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export function useAuth() {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};

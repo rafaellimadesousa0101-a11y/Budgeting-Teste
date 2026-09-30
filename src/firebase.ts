@@ -8,6 +8,11 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInAnonymously,
+  updateProfile,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged,
   type User,
@@ -170,10 +175,76 @@ export async function loginWithGoogle(): Promise<User> {
   try {
     const cred = await signInWithPopup(auth, googleProvider);
     return cred.user;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao fazer login com Google:', error);
+    if (
+      error?.code === 'auth/operation-not-supported-in-this-environment' ||
+      error?.message?.includes('action is invalid') ||
+      error?.message?.includes('invalid action') ||
+      error?.code === 'auth/invalid-action-code'
+    ) {
+      throw new Error(
+        'O login via popup do Google não é suportado pelo WebView do Android. Utilize o Login com E-mail e Senha para sincronizar no APK.'
+      );
+    }
     throw error;
   }
+}
+
+export async function loginWithEmail(email: string, pass: string): Promise<User> {
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
+    return cred.user;
+  } catch (error: any) {
+    console.error('Erro ao fazer login com e-mail:', error);
+    if (error?.code === 'auth/invalid-credential' || error?.code === 'auth/wrong-password' || error?.code === 'auth/user-not-found') {
+      throw new Error('E-mail ou senha incorretos.');
+    }
+    if (error?.code === 'auth/invalid-email') {
+      throw new Error('E-mail em formato inválido.');
+    }
+    throw error;
+  }
+}
+
+export async function registerWithEmail(email: string, pass: string, name?: string): Promise<User> {
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
+    if (name && cred.user) {
+      try {
+        await updateProfile(cred.user, { displayName: name.trim() });
+      } catch {
+        // ignore
+      }
+    }
+    return cred.user;
+  } catch (error: any) {
+    console.error('Erro ao registrar usuário:', error);
+    if (error?.code === 'auth/email-already-in-use') {
+      throw new Error('Este e-mail já está cadastrado. Tente entrar com sua senha.');
+    }
+    if (error?.code === 'auth/weak-password') {
+      throw new Error('A senha deve ter pelo menos 6 caracteres.');
+    }
+    if (error?.code === 'auth/invalid-email') {
+      throw new Error('E-mail em formato inválido.');
+    }
+    throw error;
+  }
+}
+
+export async function loginAnonymously(): Promise<User> {
+  try {
+    const cred = await signInAnonymously(auth);
+    return cred.user;
+  } catch (error: any) {
+    console.error('Erro ao logar como anônimo:', error);
+    throw error;
+  }
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email.trim());
 }
 
 export async function logoutUser(): Promise<void> {

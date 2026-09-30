@@ -42,6 +42,7 @@ import {
   AVATARS,
   DefaultEmptyAvatar,
 } from '../data/avatars.tsx';
+import { AuthModal } from './AuthModal.tsx';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -85,8 +86,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [visibleCount, setVisibleCount] = useState<number>(4);
 
-  const { user, isOnline, isSyncing, loginWithGoogle, logout } = useAuth();
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const { user, isOnline, isSyncing, logout } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -626,24 +627,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 ) : (
                   <button
                     type="button"
-                    disabled={isLoggingIn}
-                    onClick={async () => {
-                      setIsLoggingIn(true);
-                      try {
-                        await loginWithGoogle();
-                      } catch (e) {
-                        console.error(e);
-                      } finally {
-                        setIsLoggingIn(false);
-                      }
-                    }}
+                    onClick={() => setShowAuthModal(true)}
                     className="flex items-center gap-1.5 py-1 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700 rounded-lg text-xs font-medium text-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer shadow-2xs"
                   >
-                    {isLoggingIn ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
-                    ) : (
-                      <LogIn className="w-3.5 h-3.5 text-emerald-600" />
-                    )}
+                    <LogIn className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Entrar</span>
                   </button>
                 )}
@@ -1267,25 +1254,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     ) : (
                       <button
                         type="button"
-                        disabled={isLoggingIn}
-                        onClick={async () => {
-                          setIsLoggingIn(true);
-                          try {
-                            await loginWithGoogle();
-                          } catch (e) {
-                            console.error(e);
-                          } finally {
-                            setIsLoggingIn(false);
-                          }
-                        }}
+                        onClick={() => setShowAuthModal(true)}
                         className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer font-medium"
                       >
-                        {isLoggingIn ? (
-                          <RefreshCw className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <LogIn className="w-3 h-3" />
-                        )}
-                        <span>Conectar Google</span>
+                        <LogIn className="w-3 h-3" />
+                        <span>Acessar / Conectar</span>
                       </button>
                     )}
                   </div>
@@ -1388,6 +1361,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* Modal de Autenticação */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
       )}
     </div>
   );
