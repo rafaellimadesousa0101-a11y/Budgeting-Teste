@@ -20,7 +20,7 @@ import {
 import {
   initializeFirestore,
   persistentLocalCache,
-  persistentMultipleTabManager,
+  persistentSingleTabManager,
   getFirestore,
   doc,
   collection,
@@ -38,49 +38,22 @@ import {
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 import { Transaction, SavingBox, AiConversation } from './types.ts';
-import { initializeAppCheck, CustomProvider, getToken, type AppCheck } from 'firebase/app-check';
 
 // 1. Initialize Firebase App
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize Firebase App Check
-let appCheckInstance: AppCheck | null = null;
-if (typeof window !== 'undefined') {
-  try {
-    appCheckInstance = initializeAppCheck(app, {
-      provider: new CustomProvider({
-        getToken: () => {
-          return Promise.resolve({
-            token: `appcheck-verified-${Date.now()}`,
-            expireTimeMillis: Date.now() + 60 * 60 * 1000,
-          });
-        },
-      }),
-      isTokenAutoRefreshEnabled: true,
-    });
-  } catch {
-    // App check graceful fallback in test/dev
-  }
-}
-
 export async function getAppCheckToken(): Promise<string | null> {
-  if (!appCheckInstance) return null;
-  try {
-    const res = await getToken(appCheckInstance);
-    return res.token;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-// 2. Initialize Firestore with Offline Persistence Cache and Database ID
+// 2. Initialize Firestore with safe single-tab cache for mobile WebView and browsers
 let firestoreDb: ReturnType<typeof getFirestore>;
 try {
   firestoreDb = initializeFirestore(
     app,
     {
       localCache: persistentLocalCache({
-        tabManager: persistentMultipleTabManager(),
+        tabManager: persistentSingleTabManager(undefined),
       }),
     },
     firebaseConfig.firestoreDatabaseId
@@ -205,6 +178,12 @@ export async function loginWithEmail(email: string, pass: string): Promise<User>
     return cred.user;
   } catch (error: any) {
     console.error('Erro ao fazer login com e-mail:', error);
+    const msg = error?.message || '';
+    if (msg.includes('PASSWORD_LOGIN_DISABLED') || error?.code === 'auth/operation-not-allowed') {
+      throw new Error(
+        'O login por E-mail/Senha está desativado no console do Firebase. No console do Firebase (Authentication > Métodos de login), clique em E-mail/Senha e marque Ativar.'
+      );
+    }
     if (error?.code === 'auth/invalid-credential' || error?.code === 'auth/wrong-password' || error?.code === 'auth/user-not-found') {
       throw new Error('E-mail ou senha incorretos.');
     }
@@ -228,6 +207,12 @@ export async function registerWithEmail(email: string, pass: string, name?: stri
     return cred.user;
   } catch (error: any) {
     console.error('Erro ao registrar usuário:', error);
+    const msg = error?.message || '';
+    if (msg.includes('PASSWORD_LOGIN_DISABLED') || error?.code === 'auth/operation-not-allowed') {
+      throw new Error(
+        'O cadastro por E-mail/Senha está desativado no console do Firebase. No console do Firebase (Authentication > Métodos de login), clique em E-mail/Senha e marque Ativar.'
+      );
+    }
     if (error?.code === 'auth/email-already-in-use') {
       throw new Error('Este e-mail já está cadastrado. Tente entrar com sua senha.');
     }
@@ -247,6 +232,12 @@ export async function loginAnonymously(): Promise<User> {
     return cred.user;
   } catch (error: any) {
     console.error('Erro ao logar como anônimo:', error);
+    const msg = error?.message || '';
+    if (msg.includes('ADMIN_ONLY_OPERATION') || error?.code === 'auth/operation-not-allowed') {
+      throw new Error(
+        'O acesso como convidado está desativado no console do Firebase. Ative "Anônimo" em Authentication > Métodos de login ou adicione "localhost" aos Domínios Autorizados.'
+      );
+    }
     throw error;
   }
 }
